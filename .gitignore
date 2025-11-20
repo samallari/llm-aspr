@@ -1,0 +1,10 @@
+# Data
+
+# Dependencies
+
+/node_modules
+
+# misc
+.DS_Store
+.venv
+.idea
