@@ -1,5 +1,8 @@
 # Data
 
+# Config
+src/config.py
+
 # Dependencies
 /node_modules
 
