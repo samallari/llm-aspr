@@ -3,26 +3,30 @@ Uses OpenReview API to scrape papers, reviews, and decisions from OpenReview to 
 """
 from openreview.api import OpenReviewClient
 import json
+import time
 
-REQUEST_LIMIT = 5
+# limit the number of papers to fetch for dataset creation
+PAPER_LIMIT = 50
 
-def get_conference_data(venue_id, year):
-    # Initialize client (uses OPENREVIEW_USERNAME and OPENREVIEW_PASSWORD env vars if set)
+def get_conference_data(venue_id, year, verbose=True):
+    # Initialize client
     client = OpenReviewClient(
         baseurl='https://api2.openreview.net'
     )
 
-    # 1. Get all submissions
+    # 1. API call to get all submissions
     print("Fetching submissions...")
     submissions = list(client.get_all_notes(
         invitation=f'{venue_id}/{year}/Conference/-/Submission'
-    ))[:REQUEST_LIMIT]
+    ))[:PAPER_LIMIT]
     print(f"Found {len(submissions)} submissions")
 
     all_data = []
 
+    # for each submission, makes 2 API calls: one for reviews, one for decision
     for i, submission in enumerate(submissions):
-        print(f"Processing paper {i+1}/{len(submissions)}: {submission.id}")
+        if verbose:
+            print(f"Processing paper {i+1}/{len(submissions)}: {submission.id}")
 
         paper_data = {
             'venue': venue_id,
@@ -33,7 +37,7 @@ def get_conference_data(venue_id, year):
             'decision': None
         }
 
-        # 2. Get reviews
+        # 2. API call to get reviews
         reviews = client.get_all_notes(
             forum=submission.id,
             invitation=f'{venue_id}/{year}/Conference/Submission{submission.number}/-/Official_Review'
@@ -50,31 +54,39 @@ def get_conference_data(venue_id, year):
                 'confidence': content.get('confidence', {}).get('value')
             })
 
-        # 3. Get decision
+        # 3. API call to get decision
         decisions = client.get_all_notes(
             forum=submission.id,
             invitation=f'{venue_id}/{year}/Conference/Submission{submission.number}/-/Decision'
         )
 
         for decision in decisions:
-            paper_data['decision'] = decision.content.get('decision', {}).get('value')
+            decision_value = decision.content.get('decision', {}).get('value')
+            # clean up decision text
+            if decision_value and 'Accept' in decision_value:
+                paper_data['decision'] = 'Accept'
+            else:
+                paper_data['decision'] = 'Reject'
             break
 
         all_data.append(paper_data)
+        time.sleep(2)  # Stay under 60 API calls/min rate limit
 
     return all_data
 
 # Usage
-venue_id = "ICLR.cc"
-year = "2024"
-data = get_conference_data(venue_id, year)
+if __name__ == "__main__":
+    venue_id = "ICLR.cc"
+    year = "2024"
+    data = get_conference_data(venue_id, year, verbose=True)
 
-# Save to JSON
-with open('conference_data.json', 'w') as f:
-    json.dump(data, f, indent=2)
+    # Save to JSON
+    results_file = 'conference_data.json'
+    with open(results_file, 'w') as f:
+        json.dump(data, f, indent=2)
 
-print(f"\nTotal papers: {len(data)}")
-accepted = sum(1 for p in data if p['decision'] and 'accept' in p['decision'].lower())
-rejected = sum(1 for p in data if p['decision'] and 'reject' in p['decision'].lower())
-print(f"Accepted: {accepted}")
-print(f"Rejected: {rejected}")
+    print(f"\nTotal papers: {len(data)}")
+    accepted = sum(1 for p in data if p['decision'] and 'accept' in p['decision'].lower())
+    rejected = sum(1 for p in data if p['decision'] and 'reject' in p['decision'].lower())
+    print(f"Accepted: {accepted}")
+    print(f"Rejected: {rejected}")
