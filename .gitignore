@@ -1,7 +1,7 @@
 # Data
-
+data/raw/
 # Config
-src/config.py
+
 
 # Dependencies
 /node_modules
