@@ -1,21 +1,28 @@
-# llm-aspr
-Final Project for ICS 691G: NLP and LLMs, an LLM-based classifier for automated scholarly paper review (ASPR)
+# LLM-ASPR: LLM-based Classifier for Automated Scholarly Paper Review
+Authors: [James Ligeralde](https://github.com/jligeral), [Samantha Mallari](https://github.com/samallari), [Tevin Takata](https://github.com/tevin-takata), [Sean Flynn](https://github.com/seanhflynn)
 
-### Setup Python environment
+This is a final project for ICS 691G: NLP and LLMs (Fall 2025).
+
+## 1. Setup Python environment
 ```
 python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements
 ```
 
-### Setup .env with your openreview credentials
-Create a .env  file with the following format:
+## 2. Setup .env
+Copy the example .env file and replace the placeholder values with your OpenReview credentials.
 ```
-EMAIL=<OPENREVIEW-EMAIL>
-PASSWORD=<OPENREVIEW-PASSWORD>
+cp .env.example .env
 ```
-Then run `python config.py` to instantiate environement variables.
+Run `python config.py` to instantiate environment variables.
 
-### Run data_scraper.py
+## 3. Dataset Generation
+Run data_scraper.py to collect raw data from OpenReview from a single conference.
 ```
+cd data
 python data_scraper.py
 ```
+
+## 4. Model Evaluation
+Run `notebooks/baseline_bert_classifier.ipynb` to fine-tune a BERT-based classifier on the dataset and evaluate its performance.

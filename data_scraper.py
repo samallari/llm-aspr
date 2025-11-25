@@ -33,6 +33,7 @@ def get_conference_data(venue_id, year, verbose=True):
             'year': year,
             'paper_id': submission.id,
             'title': submission.content.get('title', {}).get('value'),
+            'abstract': submission.content.get('abstract', {}).get('value'),
             'reviews': [],
             'decision': None
         }
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     data = get_conference_data(venue_id, year, verbose=True)
 
     # Save to JSON
-    results_file = 'conference_data.json'
+    results_file = 'data/ICLR2024_sample50.json'
     with open(results_file, 'w') as f:
         json.dump(data, f, indent=2)
 

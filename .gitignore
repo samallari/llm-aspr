@@ -1,8 +1,9 @@
 # Data
 data/raw/
 data/processed
-# Config
 
+# Config
+.env
 
 # Dependencies
 /node_modules
@@ -11,5 +12,4 @@ data/processed
 .DS_Store
 .venv
 .idea
-
-.env
+upload_to_hf.py

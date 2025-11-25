@@ -1,3 +1,10 @@
 requests
 openreview-py
 python-dotenv
+transformers
+scikit-learn
+datasets
+numpy
+matplotlib
+seaborn
+pandas
