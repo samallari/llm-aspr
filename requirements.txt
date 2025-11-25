@@ -8,3 +8,5 @@ numpy
 matplotlib
 seaborn
 pandas
+accelerate
+bitsandbytes
