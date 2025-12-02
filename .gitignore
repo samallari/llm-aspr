@@ -13,3 +13,5 @@ data/processed
 .venv
 .idea
 upload_to_hf.py
+*.slurm
+*vscode
